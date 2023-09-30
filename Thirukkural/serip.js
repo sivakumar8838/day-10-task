@@ -1,64 +1,51 @@
-      // create the function for specific thirukural at this explain and english translate to button click 
-      function explainkural(a){
-         // n is the thirukural number 
-         let siva = document.querySelectorAll(".full")[a - 1]; // Select the corresponding explanation div
-         siva.innerHTML = ""; // Clear previous explanations if any
-      fetch(`https://api-thirukkural.vercel.app/api?num=${a}`)
-      .then(sa=>sa.json())
-      .then(data=>{
-         //  to get the information form the thirukural api
-         let title=data.sect_tam;
-         let chapter=data.chap_tam
-         let exp=data.tam_exp
-         let engtitle=data.sect_eng;
-         let engChap=data.chap_eng;
-         let engKural1=data.eng;
-         let engExp=data.eng_exp;
-         //  to append the infromation to create the div tag
-         let tamil=document.createElement('div')
-         tamil.className="tamilKuralExp"
-         tamil.innerHTML=` <hr>  <h4 class="red">${title}</h4>
-                             <h6>${chapter}</h6>
-                             <p>${exp}</p>
-                             <h4 class="red">${engtitle}</h4>
-                             <h6>${engChap}</h6>
-                             <p>${engKural1}</p>
-                             <p>${engExp}</p><hr>`
-         siva.appendChild(tamil)                    
- 
-      })
-     }
- 
-     // Create an async function to fetch and display Thirukural  in order
- 
-     async function Thirukural() {
-         for (let i = 1; i <= 1330; i++) {
-             // Use await to fetch each sequentially
-           try{
-             let response = await fetch(`https://api-thirukkural.vercel.app/api?num=${i}`);
-           
-             let data = await response.json();
- 
-             // Create a new paragraph element for each verse
-             let kurals = document.createElement('p');
-     
-             kurals.innerHTML = `
-                     <p>${i}: ${data.line1}</p>
-                     <p class="line2">${data.line2}</p>
-                     <button class="kuralExplain" onclick="explainkural(${i})">Explain</button><hr>
-                     <div class="full"></div>
-             `;
- 
-             // Append the order to the outblock container
-             let as = document.querySelector(".sk");
-             as.appendChild(kurals);
-           }
-         //   to error handle for the thirukural use catch
-            catch(error){
-             console.log('error for thirukral',error)
-            }
-         }
-     }
- 
-     // Call the async function to display in order when the page loads
-    Thirukural()
+//   to get the element the  from html
+
+let Word = document.querySelector(".Word")
+let buttonSearch=document.querySelector(".siva")
+let meaning = document.querySelector('.sk');
+// to use async function to click search button to api use meanings and part of speech
+async function searchmean() {
+    // to error handle use try and catch
+try {
+// to get the word from the user is store bu word
+    let word = Word.value;
+    // api link fetch json link
+let as=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+let data=await as.json();
+//  console.log(data)
+    let meaningword = data[0].meanings;
+    
+    //  to create the list and list items
+
+    let list = document.createElement('ul')
+    // to use for loop meaning handle
+
+for(let partOfSpeech of meaningword ){
+    let listItem = document.createElement('li');
+    // to append the inner html listItem
+
+    listItem.innerHTML = ` <b class="sa"><hr>Part Of Speech:${partOfSpeech.partOfSpeech}</b>`;
+    // to create the order list is sublist
+
+    let subList = document.createElement('ol');
+    
+for (let definition of partOfSpeech.definitions) {
+        let subListItem = document.createElement('li');
+        subListItem.innerHTML = `${definition.definition}`;
+        subList.appendChild(subListItem);
+    }
+
+    // append the sublist to the list item
+    listItem.appendChild(subList);
+
+    // append the list items to the main list
+    list.appendChild(listItem);
+}
+
+meaning.innerHTML=``;
+meaning.appendChild(list);
+}
+catch (error) {
+console.log('error fetching the meaning', error);
+}
+}
